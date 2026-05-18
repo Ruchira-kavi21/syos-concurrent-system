@@ -1,9 +1,9 @@
 package server.network;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import shared.dto.Request;
+import shared.dto.Response;
+
+import java.io.*;
 import java.net.Socket;
 
 public class ClientConnection {
@@ -14,16 +14,18 @@ public class ClientConnection {
         try {
             Socket socket = new Socket(HOST, PORT);
 
-            PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
+            ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
+            ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
 
-            BufferedReader reader = new BufferedReader( new InputStreamReader(socket.getInputStream()));
+            Request request = new Request("Test", "hello from user client");
+            output.writeObject(request);
+            Response response = (Response) input.readObject();
 
-            writer.println("Hello from client!");
-            String response = reader.readLine();
-            System.out.println("Response from server: " + response);
+            System.out.println("Status: " + response.getStatus());
+            System.out.println("Message: " + response.getMessage());
             socket.close();
         }
-        catch (IOException e) {
+        catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
