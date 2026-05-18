@@ -1,7 +1,8 @@
 package server.network;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import shared.dto.Request;
+import shared.dto.Response;
+
+import java.io.*;
 import java.net.Socket;
 
 public class ClientHandler implements Runnable{
@@ -14,17 +15,16 @@ public class ClientHandler implements Runnable{
     @Override
     public void run(){
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            ObjectInputStream input = new ObjectInputStream(clientSocket.getInputStream());
+            ObjectOutputStream output = new ObjectOutputStream(clientSocket.getOutputStream());
 
-            PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true);
+            Request request = (Request) input.readObject();
 
-            //read message from client
-            String request = reader.readLine();
-            System.out.println("Client request: " + request);
+            System.out.println("Action: " + request.getAction());
+            System.out.println("Data: " + request.getData());
 
-            //temporary response
-            writer.println("Server received: " + request);
-
+            Response response = new Response("success", "Request processed successfully");
+            output.writeObject(response);
             clientSocket.close();
         }
         catch (Exception e) {
