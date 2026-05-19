@@ -16,6 +16,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>8.0.33</version>
+        </dependency>
+        <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
             <version>21.0.6</version>
@@ -133,8 +138,7 @@
                         <!-- Default configuration for running with: mvn clean javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>com.syos.syosconcurrentsystem/com.syos.syosconcurrentsystem.HelloApplication
-                            </mainClass>
+                            <mainClass>client.gui.InventoryUI</mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>
                             <jlinkImageName>app</jlinkImageName>

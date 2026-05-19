@@ -4,16 +4,16 @@ import java.io.Serializable;
 
 public class Request implements Serializable {
     private String action;
-    private String data;
+    private Object data;
 
-    public Request (String action, String data){
+    public Request (String action, PurchaseRequest data){
         this.action = action;
         this.data = data;
     }
     public String getAction(){
         return action;
     }
-    public String getData(){
+    public Object getData(){
         return data;
     }
 }

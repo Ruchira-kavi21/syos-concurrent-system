@@ -23,7 +23,12 @@ public class ClientHandler implements Runnable{
             System.out.println("Action: " + request.getAction());
             System.out.println("Data: " + request.getData());
 
-            Response response = new Response("success", "Request processed successfully");
+//            Response response = new Response("success", "Request processed successfully");
+//            output.writeObject(response);
+//            clientSocket.close();
+
+            RequestProcessor processor = new RequestProcessor();
+            Response response = processor.process(request);
             output.writeObject(response);
             clientSocket.close();
         }

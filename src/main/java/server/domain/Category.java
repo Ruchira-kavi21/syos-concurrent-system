@@ -1,9 +1,10 @@
 package server.domain;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Category extends InventoryComponent{
+public class Category extends InventoryComponent implements Serializable {
 
     private final List<InventoryComponent> components = new ArrayList<>();
     public Category(String name, String code) {

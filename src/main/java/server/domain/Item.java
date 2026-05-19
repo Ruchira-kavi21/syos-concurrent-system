@@ -1,10 +1,11 @@
 package server.domain;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class Item extends InventoryComponent{
+public class Item extends InventoryComponent implements Serializable {
     private final String code;
     private final String name;
     private final double price;
@@ -32,6 +33,11 @@ public class Item extends InventoryComponent{
     public double getPrice() {
         return price;
     }
+
+    public int getShelfCapacity() {
+        return shelfCapacity;
+    }
+
     //    public List<Batch> getBatchList() {
 //        return batchList;
 //    }

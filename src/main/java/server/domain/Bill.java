@@ -1,10 +1,11 @@
 package server.domain;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Bill {
+public class Bill implements Serializable {
     private final String billNumber;
     private final LocalDateTime date;
     private final double totalAmount;

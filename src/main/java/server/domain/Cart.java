@@ -1,9 +1,10 @@
 package server.domain;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Cart {
+public class Cart implements Serializable {
     private final Map<Item, Integer> items = new HashMap<>();
 
     public void addItem(Item item, int quantity)

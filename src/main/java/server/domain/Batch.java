@@ -1,8 +1,9 @@
 package server.domain;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
-public class Batch {
+public class Batch implements Serializable {
     private final String batchNumber;
     private final LocalDate dateOfPurchase;
     private final LocalDate expiryDate;

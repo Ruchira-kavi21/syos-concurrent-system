@@ -1,6 +1,8 @@
 package server.domain;
 
-public abstract class InventoryComponent {
+import java.io.Serializable;
+
+public abstract class InventoryComponent implements Serializable {
     protected String name;
     protected String code;
 

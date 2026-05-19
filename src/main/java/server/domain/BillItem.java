@@ -1,6 +1,8 @@
 package server.domain;
 
-public class BillItem {
+import java.io.Serializable;
+
+public class BillItem implements Serializable {
     private final String itemName;
     private final int quantity;
     private final double unitPrice;
