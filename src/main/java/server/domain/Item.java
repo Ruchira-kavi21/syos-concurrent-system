@@ -8,7 +8,7 @@ import java.util.List;
 public class Item extends InventoryComponent implements Serializable {
     private final String code;
     private final String name;
-    private final double price;
+    private double price;
     private int shelfCapacity;
     private final List<Batch> storeBatches;
     private final List<Batch> shelfBatches;
@@ -36,6 +36,9 @@ public class Item extends InventoryComponent implements Serializable {
 
     public int getShelfCapacity() {
         return shelfCapacity;
+    }
+    public void setPrice(double price) {
+        this.price = price;
     }
 
     //    public List<Batch> getBatchList() {

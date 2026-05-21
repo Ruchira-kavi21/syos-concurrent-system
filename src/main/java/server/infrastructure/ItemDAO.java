@@ -130,11 +130,9 @@ public class ItemDAO implements Serializable {
 
         String sql = "SELECT * FROM items";
 
-        Connection connection =
-                DatabaseConnection.getInstance().getConnection();
+        Connection connection = DatabaseConnection.getInstance().getConnection();
 
-        PreparedStatement statement =
-                connection.prepareStatement(sql);
+        PreparedStatement statement = connection.prepareStatement(sql);
 
         ResultSet resultSet = statement.executeQuery();
 
@@ -167,5 +165,34 @@ public class ItemDAO implements Serializable {
         int rowsUpdated = statement.executeUpdate();
 
         return rowsUpdated > 0;
+    }
+    public Item getItemByCode(
+            String code) {
+
+        try {
+
+            String sql = "SELECT * FROM items WHERE code = ?";
+
+            PreparedStatement statement = connection.prepareStatement(sql);
+
+            statement.setString(1, code);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+
+                return new Item(
+                        resultSet.getString("code"),
+                        resultSet.getString("name"),
+                        resultSet.getDouble("price"),
+                        resultSet.getInt("shelf_capacity")
+                );
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }

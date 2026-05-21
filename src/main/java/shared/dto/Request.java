@@ -6,7 +6,7 @@ public class Request implements Serializable {
     private String action;
     private Object data;
 
-    public Request (String action, PurchaseRequest data){
+    public Request (String action, Object data){
         this.action = action;
         this.data = data;
     }
