@@ -1,6 +1,5 @@
 package client.gui;
 
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -10,7 +9,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
 import server.domain.Item;
-import shared.dto.PurchaseRequest;
 import shared.dto.Request;
 import shared.dto.Response;
 
@@ -23,8 +21,7 @@ public class InventoryPane {
 
     private final VBox view = new VBox(15);
 
-    private final TableView<Item> table = new TableView<>();
-
+    private final TableView<BatchRow> table = new TableView<>();
 
     private final Label statusLabel = new Label();
 
@@ -38,19 +35,11 @@ public class InventoryPane {
 
         Button addItemBtn = new Button("Add Item");
 
-        Button updateItemBtn = new Button("Update Item");
-
-        Button deleteItemBtn = new Button("Delete Item");
-
         Button addBatchBtn = new Button("Add Batch Stock");
 
         refreshBtn.setOnAction(e -> loadInventory());
 
         addItemBtn.setOnAction(e -> addItem());
-
-        updateItemBtn.setOnAction(e -> updateItem());
-
-        deleteItemBtn.setOnAction(e -> deleteItem());
 
         addBatchBtn.setOnAction(e -> addBatchStock());
 
@@ -58,8 +47,6 @@ public class InventoryPane {
                 new Label("Inventory Management"),
                 table,
                 addItemBtn,
-                updateItemBtn,
-                deleteItemBtn,
                 addBatchBtn,
                 refreshBtn,
                 statusLabel
@@ -69,27 +56,67 @@ public class InventoryPane {
 
     private void createTable() {
 
-        TableColumn<Item, String> codeCol = new TableColumn<>("Code");
+        //BATCH
+        TableColumn<BatchRow, String> batchCol = new TableColumn<>("Batch");
 
-        codeCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getCode()));
+        batchCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getBatchNumber()));
 
-        TableColumn<Item, String> nameCol = new TableColumn<>("Name");
+        batchCol.setPrefWidth(120);
 
-        nameCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getName()));
+        //ITEM
 
-        TableColumn<Item, Number> priceCol = new TableColumn<>("Price");
+        TableColumn<BatchRow, String> itemCol = new TableColumn<>("Item");
 
-        priceCol.setCellValueFactory(data -> new SimpleDoubleProperty(data.getValue().getPrice()));
+        itemCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getItemCode()));
 
-        TableColumn<Item, Number> stockCol = new TableColumn<>("Stock");
+        itemCol.setPrefWidth(120);
 
-        stockCol.setCellValueFactory(data -> new SimpleIntegerProperty(data.getValue().getShelfCapacity()));
+        TableColumn<BatchRow, String> itemNameCol = new TableColumn<>("Item Name");
+
+        itemCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getItemName()));
+
+        itemCol.setPrefWidth(120);
+
+        // ===== PURCHASE DATE =====
+
+        TableColumn<BatchRow, String> purchaseCol = new TableColumn<>("Purchase");
+
+        purchaseCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getPurchaseDate()));
+
+        purchaseCol.setPrefWidth(130);
+
+        // ===== EXPIRY DATE =====
+
+        TableColumn<BatchRow, String> expiryCol = new TableColumn<>("Expiry");
+
+        expiryCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getExpiryDate()));
+
+        expiryCol.setPrefWidth(130);
+
+        // ===== QUANTITY =====
+
+        TableColumn<BatchRow, Number> qtyCol = new TableColumn<>("Qty");
+
+        qtyCol.setCellValueFactory(data -> new SimpleIntegerProperty(data.getValue().getQuantity()));
+
+        // ===== LOCATION =====
+
+        TableColumn<BatchRow, String> locationCol = new TableColumn<>("Location");
+
+        locationCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getLocation()));
+
+        locationCol.setPrefWidth(120);
+
+        // ===== ADD COLUMNS =====
 
         table.getColumns().addAll(
-                codeCol,
-                nameCol,
-                priceCol,
-                stockCol
+                batchCol,
+                itemCol,
+                itemNameCol,
+                purchaseCol,
+                expiryCol,
+                qtyCol,
+                locationCol
         );
     }
 
@@ -102,16 +129,15 @@ public class InventoryPane {
             ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
 
             ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
-
-            Request request = new Request("GET_ITEMS", null);
+            Request request = new Request("GET_BATCHES", null);
 
             output.writeObject(request);
 
             Response response = (Response) input.readObject();
 
-            List<Item> items = (List<Item>) response.getData();
+            List<BatchRow> rows = (List<BatchRow>) response.getData();
 
-            ObservableList<Item> itemList = FXCollections.observableArrayList(items);
+            ObservableList<BatchRow> itemList = FXCollections.observableArrayList(rows);
 
             table.setItems(itemList);
 
@@ -147,7 +173,7 @@ public class InventoryPane {
 
                     new Label("Shelf Capacity"),
                     stockField
-    );
+        );
 
         dialog.getDialogPane().setContent(box);
 
@@ -193,80 +219,6 @@ public class InventoryPane {
                 e.printStackTrace();
             }
         });
-    }
-    private void updateItem() {
-        Item selectedItem = table.getSelectionModel().getSelectedItem();
-
-        if (selectedItem == null) {
-            statusLabel.setText("Select item first.");
-            return;
-        }
-
-        TextInputDialog dialog = new TextInputDialog(String.valueOf(selectedItem.getPrice()));
-
-        dialog.setTitle("Update Price");
-
-        dialog.setHeaderText("Enter New Price");
-
-        dialog.showAndWait().ifPresent(price -> {
-            try {
-                selectedItem.setPrice(Double.parseDouble(price));
-
-                Socket socket = new Socket("localhost", 5000);
-
-                ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
-
-                ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
-
-                Request request = new Request("UPDATE_ITEM", selectedItem);
-
-                output.writeObject(request);
-
-                Response response = (Response) input.readObject();
-
-                statusLabel.setText(response.getMessage());
-
-                loadInventory();
-
-                socket.close();
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-    }
-    private void deleteItem() {
-        Item selectedItem = table.getSelectionModel().getSelectedItem();
-
-        if (selectedItem == null) {
-
-            statusLabel.setText("Select item first.");
-            return;
-        }
-
-        try {
-
-            Socket socket = new Socket("localhost", 5000);
-
-            ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
-
-            ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
-
-            Request request = new Request("DELETE_ITEM", selectedItem.getCode());
-
-            output.writeObject(request);
-
-            Response response = (Response) input.readObject();
-
-            statusLabel.setText(response.getMessage());
-
-            loadInventory();
-
-            socket.close();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
     private void addBatchStock() {
         statusLabel.setText("Batch stock feature coming next.");

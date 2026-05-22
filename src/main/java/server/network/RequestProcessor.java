@@ -4,6 +4,7 @@ import client.gui.*;
 import server.domain.Bill;
 import server.domain.Item;
 import server.domain.TransactionType;
+import server.infrastructure.BatchDAO;
 import server.infrastructure.BillDAO;
 import server.infrastructure.ItemDAO;
 import shared.dto.Request;
@@ -27,6 +28,7 @@ public class RequestProcessor implements Serializable {
             case "GET_BILL_REPORT": return handleBillReport();
             case "GET_STOCK_REPORT": return handleStockReport();
             case "GET_RESHELVING_REPORT": return handleReshelvingReport();
+            case "GET_BATCHES": return handleGetBatches();
             default: return new Response("Error", "Unknown request type", null);
         }
     }
@@ -163,6 +165,17 @@ public class RequestProcessor implements Serializable {
             List<ReshelvingRow> rows = billDAO.getReshelvingReport();
 
             return new Response("SUCCESS", "Reshelving report loaded", rows);
+
+        } catch (Exception e) {
+            return new Response("ERROR", e.getMessage(), null);
+        }
+    }
+    private Response handleGetBatches() {
+
+        try {
+            BatchDAO batchDAO = new BatchDAO();
+            List<BatchRow> rows = batchDAO.getAllBatches();
+            return new Response("SUCCESS", "Batches loaded", rows);
 
         } catch (Exception e) {
             return new Response("ERROR", e.getMessage(), null);
